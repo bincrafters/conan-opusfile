@@ -81,4 +81,4 @@ class OpusFileConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["opusfile"]
-        self.cpp_info.includedirs = [os.path.join("include", "opus")]
+        self.cpp_info.includedirs.append(os.path.join("include", "opus"))
