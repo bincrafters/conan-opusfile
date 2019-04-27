@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from conans import ConanFile, MSBuild, tools
+from conans import ConanFile, MSBuild, AutoToolsBuildEnvironment, tools
 import os
 
 
@@ -19,7 +19,7 @@ class OpusFileConan(ConanFile):
     default_options = {"shared": False, "fPIC": True}
     _source_subfolder = "source_subfolder"
     _build_subfolder = "build_subfolder"
-
+    generators = ["pkg_config"]
     requires = (
         "opus/1.2.1@bincrafters/stable",
         "ogg/1.3.3@bincrafters/stable",
@@ -53,7 +53,17 @@ class OpusFileConan(ConanFile):
                           platforms={"x86": "Win32"})
 
     def build_configure(self):
-        raise Exception("TODO")
+        with tools.chdir(self._source_subfolder):
+            args = []
+            if self.options.shared:
+                args.extend(["--disable-static", "--enable-shared"])
+            else:
+                args.extend(["--disable-shared", "--enable-static"])
+            self.run("./autogen.sh", win_bash=tools.os_info.is_windows)
+            env_build = AutoToolsBuildEnvironment(self, win_bash=tools.os_info.is_windows)
+            env_build.configure(args=args)
+            env_build.make()
+            env_build.install()
 
     def build(self):
         if self._is_msvc:
@@ -65,9 +75,10 @@ class OpusFileConan(ConanFile):
         self.copy(pattern="COPYING", dst="licenses", src=self._source_subfolder)
         if self._is_msvc:
             include_folder = os.path.join(self._source_subfolder, "include")
-            self.copy(pattern="*", dst="include", src=include_folder)
+            self.copy(pattern="*", dst=os.path.join("include", "opus"), src=include_folder)
             self.copy(pattern="*.dll", dst="bin", keep_path=False)
             self.copy(pattern="*.lib", dst="lib", keep_path=False)
 
     def package_info(self):
         self.cpp_info.libs = ["opusfile"]
+        self.cpp_info.includedirs = [os.path.join("include", "opus")]
