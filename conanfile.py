@@ -23,7 +23,7 @@ class OpusFileConan(ConanFile):
     requires = (
         "opus/1.2.1@bincrafters/stable",
         "ogg/1.3.3@bincrafters/stable",
-        "OpenSSL/1.0.2r@conan/stable"
+        "OpenSSL/1.0.2s@conan/stable"
     )
 
     def configure(self):
