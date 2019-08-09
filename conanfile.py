@@ -10,7 +10,7 @@ class OpusFileConan(ConanFile):
     description = "stand-alone decoder library for .opus streams"
     topics = ("conan", "opus", "opusfile", "audio", "decoder", "decoding", "multimedia", "sound")
     url = "https://github.com/bincrafters/conan-opusfile"
-    homepage = "https://github.com/original_author/original_lib"
+    homepage = "https://github.com/xiph/opusfile"
     author = "Bincrafters <bincrafters@gmail.com>"
     license = "BSD-3-Clause"
     exports = ["LICENSE.md"]
@@ -21,9 +21,9 @@ class OpusFileConan(ConanFile):
     _build_subfolder = "build_subfolder"
     generators = ["pkg_config"]
     requires = (
-        "opus/1.2.1@bincrafters/stable",
+        "opus/1.3.1@bincrafters/stable",
         "ogg/1.3.3@bincrafters/stable",
-        "OpenSSL/1.0.2s@conan/stable"
+        "OpenSSL/1.1.1c@conan/stable"
     )
 
     def configure(self):
