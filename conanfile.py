@@ -17,34 +17,37 @@ class OpusFileConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
-    _source_subfolder = "source_subfolder"
-    _build_subfolder = "build_subfolder"
     generators = ["pkg_config"]
     requires = (
         "opus/1.3.1@bincrafters/stable",
         "ogg/1.3.3@bincrafters/stable",
         "OpenSSL/1.0.2s@conan/stable"
     )
+    _autotools = None
 
-    def configure(self):
-        del self.settings.compiler.libcxx
+    @property
+    def _source_subfolder(self):
+        return "source_subfolder"
+
+    @property
+    def _is_msvc(self):
+        return self.settings.os == "Windows" and \
+               self.settings.compiler == "Visual Studio"
 
     def config_options(self):
         if self.settings.os == 'Windows':
             del self.options.fPIC
 
-    @property
-    def _is_msvc(self):
-        return self.settings.compiler == "Visual Studio"
+    def configure(self):
+        del self.settings.compiler.libcxx
 
     def source(self):
-        source_url = "https://github.com/xiph/opusfile"
-        tools.get("{0}/archive/v{1}.tar.gz".format(source_url, self.version),
-                  sha256="bd9c246cf18d27e9a0815e432731d82f0978717fe2dc2b1e1dce09c184132239")
+        sha256="bd9c246cf18d27e9a0815e432731d82f0978717fe2dc2b1e1dce09c184132239"
+        tools.get("{0}/archive/v{1}.tar.gz".format(self.homepage, self.version), sha256=sha256)
         extracted_dir = self.name + "-" + self.version
         os.rename(extracted_dir, self._source_subfolder)
 
-    def build_vs(self):
+    def _build_vs(self):
         includedir = os.path.abspath(os.path.join(self._source_subfolder, "include"))
         with tools.chdir(os.path.join(self._source_subfolder, "win32", "VS2015")):
             msbuild = MSBuild(self)
@@ -52,24 +55,26 @@ class OpusFileConan(ConanFile):
             msbuild.build(project_file="opusfile.sln", targets=["opusfile"],
                           platforms={"x86": "Win32"})
 
-    def build_configure(self):
-        with tools.chdir(self._source_subfolder):
+    def _configure_autotools(self):
+        if not self._autotools:
+            with tools.chdir(self._source_subfolder):
+                self.run("./autogen.sh", win_bash=tools.os_info.is_windows)
             args = []
             if self.options.shared:
                 args.extend(["--disable-static", "--enable-shared"])
             else:
                 args.extend(["--disable-shared", "--enable-static"])
-            self.run("./autogen.sh", win_bash=tools.os_info.is_windows)
-            env_build = AutoToolsBuildEnvironment(self, win_bash=tools.os_info.is_windows)
-            env_build.configure(args=args)
-            env_build.make()
-            env_build.install()
+            self._autotools = AutoToolsBuildEnvironment(self, win_bash=tools.os_info.is_windows)
+            os.rename(os.path.join(self.build_folder, "OpenSSL.pc"), os.path.join(self.build_folder, "openssl.pc"))
+            self._autotools.configure(args=args, configure_dir=self._source_subfolder)
+        return self._autotools
 
     def build(self):
         if self._is_msvc:
-            self.build_vs()
+            self._build_vs()
         else:
-            self.build_configure()
+            autotools = self._configure_autotools()
+            autotools.make()
 
     def package(self):
         self.copy(pattern="COPYING", dst="licenses", src=self._source_subfolder)
@@ -78,6 +83,10 @@ class OpusFileConan(ConanFile):
             self.copy(pattern="*", dst=os.path.join("include", "opus"), src=include_folder)
             self.copy(pattern="*.dll", dst="bin", keep_path=False)
             self.copy(pattern="*.lib", dst="lib", keep_path=False)
+        else:
+            autotools = self._configure_autotools()
+            autotools.install()
+            tools.rmdir(os.path.join(self.package_folder, "share"))
 
     def package_info(self):
         self.cpp_info.libs = ["opusfile"]
