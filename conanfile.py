@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from conans import ConanFile, MSBuild, AutoToolsBuildEnvironment, tools
 import os
 
@@ -21,7 +19,7 @@ class OpusFileConan(ConanFile):
     requires = (
         "opus/1.3.1@bincrafters/stable",
         "ogg/1.3.3@bincrafters/stable",
-        "OpenSSL/1.0.2s@conan/stable"
+        "openssl/1.0.2t"
     )
     _autotools = None
 
@@ -40,6 +38,7 @@ class OpusFileConan(ConanFile):
 
     def configure(self):
         del self.settings.compiler.libcxx
+        del self.settings.compiler.cppstd
 
     def source(self):
         sha256="bd9c246cf18d27e9a0815e432731d82f0978717fe2dc2b1e1dce09c184132239"
