@@ -64,7 +64,6 @@ class OpusFileConan(ConanFile):
             else:
                 args.extend(["--disable-shared", "--enable-static"])
             self._autotools = AutoToolsBuildEnvironment(self, win_bash=tools.os_info.is_windows)
-            os.rename(os.path.join(self.build_folder, "OpenSSL.pc"), os.path.join(self.build_folder, "openssl.pc"))
             self._autotools.configure(args=args, configure_dir=self._source_subfolder)
         return self._autotools
 
