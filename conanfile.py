@@ -9,7 +9,6 @@ class OpusFileConan(ConanFile):
     topics = ("conan", "opus", "opusfile", "audio", "decoder", "decoding", "multimedia", "sound")
     url = "https://github.com/bincrafters/conan-opusfile"
     homepage = "https://github.com/xiph/opusfile"
-    author = "Bincrafters <bincrafters@gmail.com>"
     license = "BSD-3-Clause"
     exports = ["LICENSE.md"]
     settings = "os", "arch", "compiler", "build_type"
