@@ -17,7 +17,7 @@ class OpusFileConan(ConanFile):
     generators = ["pkg_config"]
     requires = (
         "opus/1.3.1@bincrafters/stable",
-        "ogg/1.3.3@bincrafters/stable",
+        "ogg/1.3.4",
         "openssl/1.0.2t"
     )
     _autotools = None
