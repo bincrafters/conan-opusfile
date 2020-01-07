@@ -9,7 +9,6 @@ class OpusFileConan(ConanFile):
     topics = ("conan", "opus", "opusfile", "audio", "decoder", "decoding", "multimedia", "sound")
     url = "https://github.com/bincrafters/conan-opusfile"
     homepage = "https://github.com/xiph/opusfile"
-    author = "Bincrafters <bincrafters@gmail.com>"
     license = "BSD-3-Clause"
     exports = ["LICENSE.md"]
     settings = "os", "arch", "compiler", "build_type"
@@ -18,7 +17,7 @@ class OpusFileConan(ConanFile):
     generators = ["pkg_config"]
     requires = (
         "opus/1.3.1@bincrafters/stable",
-        "ogg/1.3.3@bincrafters/stable",
+        "ogg/1.3.4",
         "openssl/1.0.2t"
     )
     _autotools = None
