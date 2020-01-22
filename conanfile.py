@@ -16,9 +16,9 @@ class OpusFileConan(ConanFile):
     default_options = {"shared": False, "fPIC": True}
     generators = ["pkg_config"]
     requires = (
-        "opus/1.3.1@bincrafters/stable",
+        "opus/1.3.1",
         "ogg/1.3.4",
-        "openssl/1.0.2t"
+        "openssl/1.0.2u"
     )
     _autotools = None
 
