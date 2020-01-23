@@ -4,13 +4,11 @@ import os
 
 class OpusFileConan(ConanFile):
     name = "opusfile"
-    version = "0.10"
     description = "stand-alone decoder library for .opus streams"
     topics = ("conan", "opus", "opusfile", "audio", "decoder", "decoding", "multimedia", "sound")
     url = "https://github.com/bincrafters/conan-opusfile"
     homepage = "https://github.com/xiph/opusfile"
     license = "BSD-3-Clause"
-    exports = ["LICENSE.md"]
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
@@ -21,10 +19,7 @@ class OpusFileConan(ConanFile):
         "openssl/1.0.2u"
     )
     _autotools = None
-
-    @property
-    def _source_subfolder(self):
-        return "source_subfolder"
+    _source_subfolder = "source_subfolder"
 
     @property
     def _is_msvc(self):
@@ -40,8 +35,7 @@ class OpusFileConan(ConanFile):
         del self.settings.compiler.cppstd
 
     def source(self):
-        sha256="bd9c246cf18d27e9a0815e432731d82f0978717fe2dc2b1e1dce09c184132239"
-        tools.get("{0}/archive/v{1}.tar.gz".format(self.homepage, self.version), sha256=sha256)
+        tools.get(**self.conan_data["sources"][self.version])
         extracted_dir = self.name + "-" + self.version
         os.rename(extracted_dir, self._source_subfolder)
 
